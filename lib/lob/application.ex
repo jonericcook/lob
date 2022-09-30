@@ -12,6 +12,7 @@ defmodule Lob.Application do
       LobWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Lob.PubSub},
+      {Redix, name: :redix},
       # Start the Endpoint (http/https)
       LobWeb.Endpoint
       # Start a worker by calling: Lob.Worker.start_link(arg)
