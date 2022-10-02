@@ -12,7 +12,7 @@ config :lob, LobWeb.Endpoint,
   http: [ip: {0, 0, 0, 0}, port: 4000],
   check_origin: false,
   code_reloader: true,
-  debug_errors: true,
+  debug_errors: false,
   secret_key_base: "PfgQjZ6jze9gRpq5rUAqqtixu5ywF3xEI1rQDM7f9qVzdyYCsjfkRo3Z2b1xz6fh",
   watchers: []
 

@@ -10,32 +10,22 @@ defmodule LobWeb.AddressController do
     render(conn, "index.json", addresses: addresses)
   end
 
-  def create(conn, %{"address" => address_params}) do
+  def create(conn, address_params) do
     with {:ok, address} <- Addresses.create_address(address_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.address_path(conn, :show, address))
       |> render("show.json", address: address)
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    address = Addresses.get_address(id)
-    render(conn, "show.json", address: address)
-  end
-
-  def update(conn, %{"id" => id, "address" => address_params}) do
-    address = Addresses.get_address(id)
-
-    with {:ok, address} <- Addresses.update_address(address, address_params) do
+  def update(conn, %{"id" => id} = address_params) do
+    with {:ok, address} <- Addresses.get_address(id), {:ok, address} <- Addresses.update_address(address, address_params) do
       render(conn, "show.json", address: address)
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    address = Addresses.get_address(id)
-
-    with {:ok, _} <- Addresses.delete_address(address) do
+    with :ok <- Addresses.delete_address(id) do
       send_resp(conn, :no_content, "")
     end
   end

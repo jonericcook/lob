@@ -5,8 +5,11 @@ defmodule LobWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", LobWeb do
+  scope "/addresses", LobWeb do
     pipe_through :api
-    resources "/addresses", AddressController
+    get "/", AddressController, :index
+    post "/", AddressController, :create
+    put "/:id", AddressController, :update
+    delete "/:id", AddressController, :delete
   end
 end
