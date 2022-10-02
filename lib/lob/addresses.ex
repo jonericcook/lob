@@ -3,102 +3,51 @@ defmodule Lob.Addresses do
   The Addresses context.
   """
 
-  import Ecto.Query, warn: false
-  alias Lob.Repo
-
   alias Lob.Addresses.Address
 
-  @doc """
-  Returns the list of addresses.
-
-  ## Examples
-
-      iex> list_addresses()
-      [%Address{}, ...]
-
-  """
   def list_addresses do
-    Repo.all(Address)
+    with {:ok, keys} <- Redix.command(:redix, ["KEYS", "*"]),
+         {:ok, result} <- mget(keys) do
+      Enum.map(result, fn address -> Jason.decode!(address) end)
+    end
   end
 
-  @doc """
-  Gets a single address.
+  def get_address(id), do: Redix.command(:redix, ["GET", id])
 
-  Raises `Ecto.NoResultsError` if the Address does not exist.
+  def create_address(address \\ %{}) do
+    changeset = Address.changeset(%{}, Map.put(address, :id, Ecto.UUID.generate()))
 
-  ## Examples
+    case changeset.valid? do
+      true ->
+        result = Ecto.Changeset.apply_changes(changeset)
+        redis_set(result)
 
-      iex> get_address!(123)
-      %Address{}
-
-      iex> get_address!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_address!(id), do: Repo.get!(Address, id)
-
-  @doc """
-  Creates a address.
-
-  ## Examples
-
-      iex> create_address(%{field: value})
-      {:ok, %Address{}}
-
-      iex> create_address(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_address(attrs \\ %{}) do
-    %Address{}
-    |> Address.changeset(attrs)
-    |> Repo.insert()
+      false ->
+        {:error, changeset}
+    end
   end
 
-  @doc """
-  Updates a address.
-
-  ## Examples
-
-      iex> update_address(address, %{field: new_value})
-      {:ok, %Address{}}
-
-      iex> update_address(address, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_address(%Address{} = address, attrs) do
+  def update_address(address, attrs) do
     address
     |> Address.changeset(attrs)
-    |> Repo.update()
   end
 
-  @doc """
-  Deletes a address.
-
-  ## Examples
-
-      iex> delete_address(address)
-      {:ok, %Address{}}
-
-      iex> delete_address(address)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_address(%Address{} = address) do
-    Repo.delete(address)
+  def delete_address(id) do
+    with {:ok, _} <- Redix.command(:redix, ["DEL", id]) do
+      :ok
+    end
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking address changes.
+  defp mget([]), do: {:ok, []}
+  defp mget(keys), do: Redix.command(:redix, ["MGET" | keys])
 
-  ## Examples
+  defp redis_set(value) do
+    case Redix.command(:redix, ["SET", value.id, Jason.encode!(value)]) do
+      {:ok, "OK"} ->
+        {:ok, value}
 
-      iex> change_address(address)
-      %Ecto.Changeset{data: %Address{}}
-
-  """
-  def change_address(%Address{} = address, attrs \\ %{}) do
-    Address.changeset(address, attrs)
+      error ->
+        error
+    end
   end
 end

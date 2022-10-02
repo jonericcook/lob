@@ -34,6 +34,7 @@ defmodule Lob.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.6.12"},
+      {:ecto_sql, "~> 3.6"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},

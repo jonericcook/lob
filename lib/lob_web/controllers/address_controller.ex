@@ -2,7 +2,6 @@ defmodule LobWeb.AddressController do
   use LobWeb, :controller
 
   alias Lob.Addresses
-  alias Lob.Addresses.Address
 
   action_fallback LobWeb.FallbackController
 
@@ -12,7 +11,7 @@ defmodule LobWeb.AddressController do
   end
 
   def create(conn, %{"address" => address_params}) do
-    with {:ok, %Address{} = address} <- Addresses.create_address(address_params) do
+    with {:ok, address} <- Addresses.create_address(address_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.address_path(conn, :show, address))
@@ -21,22 +20,22 @@ defmodule LobWeb.AddressController do
   end
 
   def show(conn, %{"id" => id}) do
-    address = Addresses.get_address!(id)
+    address = Addresses.get_address(id)
     render(conn, "show.json", address: address)
   end
 
   def update(conn, %{"id" => id, "address" => address_params}) do
-    address = Addresses.get_address!(id)
+    address = Addresses.get_address(id)
 
-    with {:ok, %Address{} = address} <- Addresses.update_address(address, address_params) do
+    with {:ok, address} <- Addresses.update_address(address, address_params) do
       render(conn, "show.json", address: address)
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    address = Addresses.get_address!(id)
+    address = Addresses.get_address(id)
 
-    with {:ok, %Address{}} <- Addresses.delete_address(address) do
+    with {:ok, _} <- Addresses.delete_address(address) do
       send_resp(conn, :no_content, "")
     end
   end
