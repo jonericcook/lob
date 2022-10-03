@@ -35,6 +35,7 @@ defmodule Lob.Addresses do
     address = for {key, val} <- address, into: %{}, do: {String.to_atom(key), val}
 
     address
+    |> maybe_remove_line2(attrs)
     |> Address.changeset(attrs)
     |> set_address()
   end
@@ -56,19 +57,37 @@ defmodule Lob.Addresses do
   end
 
   def do_search(addresses, [search | rest]) do
-    filtered_addresses = Enum.filter(addresses, fn address ->
-      address_string = address_to_string(address)
-      String.contains?(address_string, search)
-    end)
+    filtered_addresses =
+      Enum.filter(addresses, fn address ->
+        address_string = address_to_string(address)
+        String.contains?(address_string, search)
+      end)
+
     do_search(filtered_addresses, rest)
   end
 
-  def address_to_string(%{"line1" => line1, "line2" => line2, "city" => city, "state" => state, "zip" => zip}) do
+  def address_to_string(%{
+        "line1" => line1,
+        "line2" => line2,
+        "city" => city,
+        "state" => state,
+        "zip" => zip
+      }) do
     line1 <> " " <> line2 <> " " <> city <> " " <> state <> " " <> zip
   end
 
   def address_to_string(%{"line1" => line1, "city" => city, "state" => state, "zip" => zip}) do
     line1 <> " " <> city <> " " <> state <> " " <> zip
+  end
+
+  defp maybe_remove_line2(address, attrs) do
+    case Map.has_key?(attrs, "line2") do
+      true ->
+        address
+
+      false ->
+        Map.delete(address, :line2)
+    end
   end
 
   defp mget([]), do: {:ok, []}

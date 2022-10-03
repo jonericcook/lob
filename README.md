@@ -1,18 +1,104 @@
-# Lob
+# Lob Take Home Coding Challenge
 
-To start your Phoenix server:
+## Start the app
 
-  * Install dependencies with `mix deps.get`
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+`docker-compose up`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Endpoints
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+**Create an address**
+`POST` `http://localhost:4000/addresses`
 
-## Learn more
+request body
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+```
+{
+  "line1": "185 Berry St",
+  "line2": "Suite 6100",
+  "city": "San Francisco",
+  "state": "CA",
+  "zip": "94107"
+}
+```
+
+response body
+```
+{
+  "city": "San Francisco",
+  "id": "5ce3084b-7a04-4f86-b56e-d78b4c38ee59",
+  "line1": "185 Berry St",
+  "line2": "Suite 6100",
+  "state": "CA",
+  "zip": "94107"
+}
+```
+
+***
+
+**List all addresses**
+`GET` `http://localhost:4000/addresses`
+
+response body
+```
+[
+  {
+    "city": "San Francisco",
+    "id": "5ce3084b-7a04-4f86-b56e-d78b4c38ee59",
+    "line1": "185 Berry St",
+    "line2": "Suite 6100",
+    "state": "CA",
+    "zip": "94107"
+  }
+]
+```
+
+***
+
+**Search Addresses**
+`GET` `http://localhost:4000/addresses?search=Su`
+
+response body
+```
+[
+  {
+    "city": "San Francisco",
+    "id": "5ce3084b-7a04-4f86-b56e-d78b4c38ee59",
+    "line1": "185 Berry St",
+    "line2": "Suite 6100",
+    "state": "CA",
+    "zip": "94107"
+  }
+]
+```
+
+***
+
+**Delete Address**
+`DELETE` `http://localhost:4000/addresses/5ce3084b-7a04-4f86-b56e-d78b4c38ee59`
+
+***
+
+**Update Address**
+`PUT` `http://localhost:4000/addresses/5ce3084b-7a04-4f86-b56e-d78b4c38ee59`
+
+request body
+
+```
+{
+  "line1": "1 Grand Avenue",
+  "city": "San Luis Obispo",
+  "state": "CA",
+  "zip": "93407"
+}
+```
+
+response body
+```
+{
+  "id": "5ce3084b-7a04-4f86-b56e-d78b4c38ee59",
+  "line1": "1 Grand Avenue",
+  "city": "San Luis Obispo",
+  "state": "CA",
+  "zip": "93407"
+}
+```
