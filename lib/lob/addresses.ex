@@ -8,7 +8,6 @@ defmodule Lob.Addresses do
   def list_addresses do
     with {:ok, keys} <- Redix.command(:redix, ["KEYS", "*"]),
          {:ok, result} <- mget(keys) do
-          IO.inspect(result)
       Enum.map(result, fn address -> Jason.decode!(address) end)
     end
   end
@@ -45,6 +44,31 @@ defmodule Lob.Addresses do
          {:ok, _} <- Redix.command(:redix, ["DEL", id]) do
       :ok
     end
+  end
+
+  def search(search) do
+    addresses = list_addresses()
+    do_search(addresses, search)
+  end
+
+  def do_search(addresses, []) do
+    addresses
+  end
+
+  def do_search(addresses, [search | rest]) do
+    filtered_addresses = Enum.filter(addresses, fn address ->
+      address_string = address_to_string(address)
+      String.contains?(address_string, search)
+    end)
+    do_search(filtered_addresses, rest)
+  end
+
+  def address_to_string(%{"line1" => line1, "line2" => line2, "city" => city, "state" => state, "zip" => zip}) do
+    line1 <> " " <> line2 <> " " <> city <> " " <> state <> " " <> zip
+  end
+
+  def address_to_string(%{"line1" => line1, "city" => city, "state" => state, "zip" => zip}) do
+    line1 <> " " <> city <> " " <> state <> " " <> zip
   end
 
   defp mget([]), do: {:ok, []}
