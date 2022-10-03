@@ -7,6 +7,7 @@
 ## Endpoints
 
 **Create an address**
+
 `POST` `http://localhost:4000/addresses`
 
 request body
@@ -36,6 +37,7 @@ response body
 ***
 
 **List all addresses**
+
 `GET` `http://localhost:4000/addresses`
 
 response body
@@ -55,6 +57,7 @@ response body
 ***
 
 **Search Addresses**
+
 `GET` `http://localhost:4000/addresses?search=Su`
 
 response body
@@ -74,11 +77,13 @@ response body
 ***
 
 **Delete Address**
+
 `DELETE` `http://localhost:4000/addresses/5ce3084b-7a04-4f86-b56e-d78b4c38ee59`
 
 ***
 
 **Update Address**
+
 `PUT` `http://localhost:4000/addresses/5ce3084b-7a04-4f86-b56e-d78b4c38ee59`
 
 request body
